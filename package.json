@@ -1,0 +1,57 @@
+{
+  "name": "rotalive-family",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RotaLive Family - Plataforma de localização familiar em tempo real",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:api": "npm run dev -w @rotalive/api",
+    "dev:web": "npm run dev -w @rotalive/web",
+    "dev:mobile": "npm run start -w @rotalive/mobile",
+    "build": "npm run build --workspaces --if-present",
+    "build:api": "npm run build -w @rotalive/api",
+    "build:web": "npm run build -w @rotalive/web",
+    "build:shared": "npm run build -w @rotalive/shared",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\"",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:generate": "npm run db:generate -w @rotalive/api",
+    "db:migrate": "npm run db:migrate -w @rotalive/api",
+    "db:push": "npm run db:push -w @rotalive/api",
+    "db:studio": "npm run db:studio -w @rotalive/api",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.0",
+    "@typescript-eslint/parser": "^8.29.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^4.3.2",
+    "eslint-plugin-import": "^2.31.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}

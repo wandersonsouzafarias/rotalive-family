@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FamilyMemberRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum FamilyMemberStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+model User {
+  id         String   @id @default(uuid())
+  supabaseId String   @unique @map("supabase_id")
+  email      String   @unique
+  name       String?
+  photoUrl   String?  @map("photo_url")
+  phone      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  ownedFamilies Family[]         @relation("FamilyOwner")
+  memberships   FamilyMember[]
+  invitations   FamilyInvitation[] @relation("InvitedBy")
+
+  @@map("users")
+}
+
+model Family {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String   @map("owner_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner       User               @relation("FamilyOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members     FamilyMember[]
+  invitations FamilyInvitation[]
+
+  @@map("families")
+}
+
+model FamilyMember {
+  id       String             @id @default(uuid())
+  familyId String             @map("family_id")
+  userId   String             @map("user_id")
+  role     FamilyMemberRole   @default(MEMBER)
+  status   FamilyMemberStatus @default(PENDING)
+  joinedAt DateTime?          @map("joined_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, userId])
+  @@map("family_members")
+}
+
+model FamilyInvitation {
+  id        String           @id @default(uuid())
+  familyId  String           @map("family_id")
+  email     String
+  token     String           @unique @default(uuid())
+  status    InvitationStatus @default(PENDING)
+  invitedBy String           @map("invited_by")
+  expiresAt DateTime         @map("expires_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  family  Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  inviter User   @relation("InvitedBy", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, email])
+  @@map("family_invitations")
+}
