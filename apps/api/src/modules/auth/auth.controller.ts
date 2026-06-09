@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Headers, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   forgotPasswordSchema,
@@ -32,7 +42,7 @@ export class AuthController {
   async register(
     @Body(new ZodValidationPipe(registerSchema)) dto: RegisterDto,
   ): Promise<AuthResponseDto> {
-    return this.authService.register(dto.email, dto.password, dto.name);
+    return this.authService.register(dto.email, dto.password, dto.name, dto.phone);
   }
 
   @Post('login')
@@ -83,5 +93,18 @@ export class AuthController {
   @ApiOperation({ summary: 'Obter usuário autenticado' })
   async me(@CurrentUser() user: AuthenticatedUser) {
     return this.authService.getMe(user.supabaseId);
+  }
+
+  @Post('sync')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Sincronizar sessão OAuth (Google)' })
+  @ApiResponse({ status: 200, type: AuthResponseDto })
+  async sync(@Headers('authorization') authHeader: string): Promise<AuthResponseDto> {
+    const token = authHeader?.replace('Bearer ', '') ?? '';
+    if (!token) {
+      throw new UnauthorizedException('Token de autenticação não fornecido');
+    }
+    return this.authService.syncSession(token);
   }
 }

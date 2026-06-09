@@ -16,7 +16,12 @@ export class AuthService {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async register(email: string, password: string, name: string): Promise<AuthTokens & { user: AuthUser }> {
+  async register(
+    email: string,
+    password: string,
+    name: string,
+    phone?: string | null,
+  ): Promise<AuthTokens & { user: AuthUser }> {
     const existing = await this.userRepository.findByEmail(email);
     if (existing) {
       throw new ConflictException('E-mail já cadastrado');
@@ -34,6 +39,7 @@ export class AuthService {
       supabaseId: authResult.user.id,
       email,
       name,
+      phone: phone ?? null,
     });
 
     return {
@@ -107,6 +113,40 @@ export class AuthService {
       throw new UnauthorizedException('Usuário não encontrado');
     }
     return this.mapToAuthUser(user);
+  }
+
+  async syncSession(accessToken: string): Promise<AuthTokens & { user: AuthUser }> {
+    let supabaseUser;
+    try {
+      supabaseUser = await this.supabaseService.getUserFromToken(accessToken);
+    } catch {
+      throw new UnauthorizedException('Sessão inválida ou expirada');
+    }
+
+    const metadata = supabaseUser.user_metadata as Record<string, string> | undefined;
+    const name = metadata?.full_name ?? metadata?.name ?? null;
+    const photoUrl = metadata?.avatar_url ?? metadata?.picture ?? null;
+
+    let user = await this.userRepository.findBySupabaseId(supabaseUser.id);
+
+    if (!user) {
+      user = await this.userRepository.create({
+        supabaseId: supabaseUser.id,
+        email: supabaseUser.email ?? '',
+        name,
+      });
+    }
+
+    if (photoUrl && !user.photoUrl) {
+      user = await this.userRepository.update(user.id, { photoUrl });
+    }
+
+    return {
+      accessToken,
+      refreshToken: '',
+      expiresIn: 3600,
+      user: this.mapToAuthUser(user),
+    };
   }
 
   private mapToAuthUser(user: {

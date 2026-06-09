@@ -4,7 +4,8 @@ import { createFamilySchema } from '@rotalive/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,9 @@ import { ApiError } from '@/lib/api';
 import { familyService } from '@/services/family.service';
 import { useAuthStore } from '@/stores/auth.store';
 
-export default function FamiliesPage() {
+function FamiliesContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const accessToken = useAuthStore((s) => s.accessToken);
   const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
@@ -26,6 +29,12 @@ export default function FamiliesPage() {
     enabled: !!accessToken,
   });
 
+  useEffect(() => {
+    if (searchParams.get('action') === 'create') {
+      setShowCreate(true);
+    }
+  }, [searchParams]);
+
   const createMutation = useMutation({
     mutationFn: (familyName: string) =>
       familyService.create(accessToken!, { name: familyName }),
@@ -34,6 +43,7 @@ export default function FamiliesPage() {
       setShowCreate(false);
       setName('');
       setApiError('');
+      router.replace('/dashboard');
     },
     onError: (error) => {
       setApiError(error instanceof ApiError ? error.message : 'Erro ao criar família');
@@ -127,5 +137,19 @@ export default function FamiliesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function FamiliesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center py-20">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-600 border-t-transparent" />
+        </div>
+      }
+    >
+      <FamiliesContent />
+    </Suspense>
   );
 }

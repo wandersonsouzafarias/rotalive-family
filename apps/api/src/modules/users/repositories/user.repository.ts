@@ -7,6 +7,7 @@ export interface CreateUserData {
   supabaseId: string;
   email: string;
   name: string | null;
+  phone?: string | null;
 }
 
 export interface UpdateUserData {

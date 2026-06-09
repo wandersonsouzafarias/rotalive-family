@@ -1,3 +1,7 @@
+'use client';
+
+import { useId } from 'react';
+
 import { cn } from '@/lib/utils';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -6,7 +10,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function Input({ label, error, className, id, ...props }: InputProps) {
-  const inputId = id ?? label?.toLowerCase().replace(/\s/g, '-');
+  const generatedId = useId();
+  const inputId = id ?? (label ? `${label.toLowerCase().replace(/\s/g, '-')}-${generatedId}` : generatedId);
+  const errorId = `${inputId}-error`;
 
   return (
     <div>
@@ -15,8 +21,22 @@ export function Input({ label, error, className, id, ...props }: InputProps) {
           {label}
         </label>
       )}
-      <input id={inputId} className={cn('input-field', error && 'border-red-500', className)} {...props} />
-      {error && <p className="error-text">{error}</p>}
+      <input
+        id={inputId}
+        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={error ? errorId : undefined}
+        className={cn(
+          'input-field transition-colors duration-200',
+          error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
+          className,
+        )}
+        {...props}
+      />
+      {error && (
+        <p id={errorId} className="error-text" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

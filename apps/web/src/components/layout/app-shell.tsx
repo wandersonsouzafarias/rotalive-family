@@ -4,9 +4,9 @@ import { Home, LogOut, MapPin, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
+import { cn } from '@/lib/utils';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
-import { cn } from '@/lib/utils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },

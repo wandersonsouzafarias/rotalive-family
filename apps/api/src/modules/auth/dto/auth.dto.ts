@@ -10,6 +10,9 @@ export class RegisterDto {
 
   @ApiProperty({ example: 'João Silva' })
   name!: string;
+
+  @ApiProperty({ example: '+5511999999999' })
+  phone!: string;
 }
 
 export class LoginDto {

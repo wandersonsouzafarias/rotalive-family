@@ -1,5 +1,4 @@
-import type { AuthUser, AuthTokens } from '@rotalive/shared';
-import type { LoginInput, RegisterInput } from '@rotalive/shared';
+import type { AuthTokens, AuthUser, LoginInput, RegisterInput } from '@rotalive/shared';
 
 import { apiRequest } from '@/lib/api';
 
@@ -28,4 +27,7 @@ export const authService = {
     }),
 
   me: (token: string) => apiRequest<AuthUser>('/auth/me', { token }),
+
+  syncSession: (token: string) =>
+    apiRequest<AuthResponse>('/auth/sync', { method: 'POST', token }),
 };
