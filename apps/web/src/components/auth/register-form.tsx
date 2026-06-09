@@ -8,6 +8,7 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ApiError } from '@/lib/api';
+import { formatApiError, mapApiFieldErrors } from '@/lib/format-api-error';
 import { POST_AUTH_ROUTE } from '@/lib/routes';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
@@ -56,17 +57,19 @@ export function RegisterForm() {
       setAuth(data.accessToken, data.refreshToken, data.user);
       router.push(POST_AUTH_ROUTE);
     } catch (error) {
-      setApiError(error instanceof ApiError ? error.message : 'Erro ao criar conta');
+      if (error instanceof ApiError) {
+        if (error.errors) setErrors(mapApiFieldErrors(error.errors));
+        setApiError(formatApiError(error));
+      } else {
+        setApiError('Erro ao criar conta');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <section
-      className="animate-fade-in-form opacity-0"
-      aria-labelledby={`${formId}-title`}
-    >
+    <section className="animate-fade-in-form opacity-0" aria-labelledby={`${formId}-title`}>
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg shadow-brand-600/5 sm:p-8">
         <h2 id={`${formId}-title`} className="text-xl font-bold text-gray-900">
           Criar sua conta
@@ -95,14 +98,14 @@ export function RegisterForm() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             error={errors.phone}
-            placeholder="+5511999999999"
+            placeholder="(11) 99999-9999"
             autoComplete="tel"
             required
             aria-required="true"
             aria-describedby={`${formId}-phone-hint`}
           />
           <p id={`${formId}-phone-hint`} className="-mt-2 text-xs text-gray-500">
-            Usado para convites familiares, SOS e recuperação de conta.
+            Aceita (11) 99999-9999 ou +5511999999999. Usado para convites, SOS e recuperação.
           </p>
 
           <Input

@@ -6,6 +6,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
 import { AuthGuard } from '../auth/auth.guard';
+
 import { CreateFamilyDto, InviteMemberDto, UpdateFamilyDto } from './dto/family.dto';
 import { FamiliesService } from './families.service';
 

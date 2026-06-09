@@ -30,20 +30,24 @@ export async function apiRequest<T>(endpoint: string, options: RequestOptions = 
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}/api/v1${endpoint}`, {
-    ...rest,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_URL}/api/v1${endpoint}`, {
+      ...rest,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new ApiError(
+      'Não foi possível conectar à API. Verifique se o servidor está rodando (npm run dev:api).',
+      0,
+    );
+  }
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new ApiError(
-      data.message ?? 'Erro na requisição',
-      response.status,
-      data.errors,
-    );
+    throw new ApiError(data.message ?? 'Erro na requisição', response.status, data.errors);
   }
 
   return (data as ApiResponse<T>).data;

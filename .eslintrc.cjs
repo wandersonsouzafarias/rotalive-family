@@ -15,9 +15,20 @@ module.exports = {
   },
   settings: {
     'import/resolver': {
-      typescript: true,
-      node: true,
+      typescript: {
+        alwaysTryTypes: true,
+        project: [
+          'apps/web/tsconfig.json',
+          'apps/api/tsconfig.json',
+          'apps/mobile/tsconfig.json',
+          'packages/shared/tsconfig.json',
+        ],
+      },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
     },
+    'import/internal-regex': '^@/',
   },
   ignorePatterns: [
     'node_modules/',
@@ -27,6 +38,7 @@ module.exports = {
     '*.config.js',
     '*.config.cjs',
     '*.config.mjs',
+    'apps/web/next-env.d.ts',
   ],
   rules: {
     '@typescript-eslint/no-unused-vars': [

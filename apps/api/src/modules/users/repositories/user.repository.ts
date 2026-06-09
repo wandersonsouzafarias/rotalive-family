@@ -4,10 +4,12 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 export interface CreateUserData {
+  id?: string;
   supabaseId: string;
   email: string;
   name: string | null;
   phone?: string | null;
+  passwordHash?: string | null;
 }
 
 export interface UpdateUserData {

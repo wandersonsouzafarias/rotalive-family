@@ -8,6 +8,7 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ApiError } from '@/lib/api';
+import { formatApiError, mapApiFieldErrors } from '@/lib/format-api-error';
 import { POST_AUTH_ROUTE } from '@/lib/routes';
 import { supabase } from '@/lib/supabase';
 import { authService } from '@/services/auth.service';
@@ -70,7 +71,12 @@ export function LoginForm() {
       setAuth(data.accessToken, data.refreshToken, data.user);
       router.push(POST_AUTH_ROUTE);
     } catch (error) {
-      setApiError(error instanceof ApiError ? error.message : 'Erro ao fazer login');
+      if (error instanceof ApiError) {
+        if (error.errors) setErrors(mapApiFieldErrors(error.errors));
+        setApiError(formatApiError(error));
+      } else {
+        setApiError('Erro ao fazer login');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -99,10 +105,7 @@ export function LoginForm() {
   };
 
   return (
-    <section
-      className="animate-fade-in-form opacity-0"
-      aria-labelledby={`${formId}-title`}
-    >
+    <section className="animate-fade-in-form opacity-0" aria-labelledby={`${formId}-title`}>
       <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-lg shadow-brand-600/5 sm:p-8">
         <h2 id={`${formId}-title`} className="sr-only">
           Formulário de login

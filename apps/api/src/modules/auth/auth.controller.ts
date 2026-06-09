@@ -20,6 +20,7 @@ import {
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../../common/interfaces/authenticated-user.interface';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
+
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import {
@@ -92,7 +93,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Obter usuário autenticado' })
   async me(@CurrentUser() user: AuthenticatedUser) {
-    return this.authService.getMe(user.supabaseId);
+    return this.authService.getMe(user.id);
   }
 
   @Post('sync')

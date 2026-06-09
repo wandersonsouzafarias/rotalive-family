@@ -27,14 +27,15 @@ enum InvitationStatus {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  supabaseId String   @unique @map("supabase_id")
-  email      String   @unique
-  name       String?
-  photoUrl   String?  @map("photo_url")
-  phone      String?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  supabaseId   String   @unique @map("supabase_id")
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  name         String?
+  photoUrl     String?  @map("photo_url")
+  phone        String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   ownedFamilies Family[]         @relation("FamilyOwner")
   memberships   FamilyMember[]

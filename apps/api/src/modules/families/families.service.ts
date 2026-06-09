@@ -8,6 +8,7 @@ import { FamilyInvitation, FamilyMemberStatus, InvitationStatus } from '@prisma/
 import { FamilyWithMembers as SharedFamilyWithMembers } from '@rotalive/shared';
 
 import { UserRepository } from '../users/repositories/user.repository';
+
 import { FamilyRepository, FamilyWithMembers } from './repositories/family.repository';
 
 @Injectable()
@@ -42,11 +43,7 @@ export class FamiliesService {
     return this.mapToFamilyWithMembers(family!);
   }
 
-  async inviteMember(
-    familyId: string,
-    userId: string,
-    email: string,
-  ): Promise<FamilyInvitation> {
+  async inviteMember(familyId: string, userId: string, email: string): Promise<FamilyInvitation> {
     await this.ensureOwnerOrAdmin(familyId, userId);
 
     const existingUser = await this.userRepository.findByEmail(email);

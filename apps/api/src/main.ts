@@ -21,10 +21,12 @@ async function bootstrap(): Promise<void> {
 
   app.setGlobalPrefix('api/v1');
 
+  // Validação feita via ZodValidationPipe nos controllers.
+  // O ValidationPipe global apenas transforma tipos, sem remover campos do body.
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      whitelist: false,
+      forbidNonWhitelisted: false,
       transform: true,
     }),
   );
