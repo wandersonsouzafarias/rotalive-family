@@ -1,6 +1,6 @@
 'use client';
 
-import { updateProfileSchema } from '@rotalive/shared';
+import { updateProfileSchema, type UpdateProfileInput } from '@rotalive/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Bell, Eye, MapPin, Shield, User } from 'lucide-react';
 import Image from 'next/image';
@@ -65,8 +65,7 @@ export default function ProfilePage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: { name?: string; phone?: string | null; photoUrl?: string | null }) =>
-      profileService.update(accessToken!, data),
+    mutationFn: (data: UpdateProfileInput) => profileService.update(accessToken!, data),
     onSuccess: (profile) => {
       if (user) {
         setUser({ ...user, profile });
@@ -111,7 +110,9 @@ export default function ProfilePage() {
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Meu perfil</h1>
-        <p className="mt-1 text-gray-600">Gerencie suas informações e configurações de privacidade</p>
+        <p className="mt-1 text-gray-600">
+          Gerencie suas informações e configurações de privacidade
+        </p>
       </div>
 
       {/* Avatar preview */}
@@ -146,7 +147,12 @@ export default function ProfilePage() {
           <h2 className="text-lg font-semibold text-gray-900">Informações pessoais</h2>
         </div>
 
-        <Input label="E-mail" value={user?.email ?? ''} disabled aria-label="E-mail (somente leitura)" />
+        <Input
+          label="E-mail"
+          value={user?.email ?? ''}
+          disabled
+          aria-label="E-mail (somente leitura)"
+        />
         <Input
           label="Nome completo"
           value={name}
@@ -173,12 +179,20 @@ export default function ProfilePage() {
         />
 
         {apiError && (
-          <div role="alert" aria-live="polite" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+          <div
+            role="alert"
+            aria-live="polite"
+            className="rounded-xl bg-red-50 p-3 text-sm text-red-700"
+          >
             {apiError}
           </div>
         )}
         {success && (
-          <div role="status" aria-live="polite" className="rounded-xl bg-green-50 p-3 text-sm text-green-700">
+          <div
+            role="status"
+            aria-live="polite"
+            className="rounded-xl bg-green-50 p-3 text-sm text-green-700"
+          >
             Perfil atualizado com sucesso!
           </div>
         )}
@@ -205,7 +219,10 @@ export default function ProfilePage() {
           {privacySettings.map((setting) => (
             <li key={setting.id} className="flex items-start justify-between gap-4 py-4">
               <div className="flex gap-3">
-                <setting.icon className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
+                <setting.icon
+                  className="mt-0.5 h-5 w-5 shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
                 <div>
                   <p className="font-medium text-gray-900">{setting.title}</p>
                   <p className="mt-0.5 text-sm text-gray-500">{setting.description}</p>
